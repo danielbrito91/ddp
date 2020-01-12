@@ -1,0 +1,22 @@
+## January 12, 2020
+
+```{r packages, include= FALSE}
+library(tidyverse)
+library(leaflet)
+library(gsheet)
+```
+
+
+```{r data, echo = FALSE}
+turismo <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1WHqFRl4mZaprrmqHwpWDcm6w9izgFexyxNt0uPm6xHg/edit?usp=sharing")
+turismo$url <- paste0("<a href='",turismo$url, "'>", turismo$title, "</a>")
+```
+
+
+### Some fun places in Porto Alegre, south of Brazil
+
+```{r plot, echo = FALSE, fig.align='center', warning=FALSE}
+turismo %>%
+        leaflet() %>% addTiles() %>%
+        addMarkers(lat = ~ lat, lng = ~lng, popup = ~url)
+```
