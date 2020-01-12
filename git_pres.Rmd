@@ -1,0 +1,51 @@
+---
+title: "My Fancy Presentation"
+author: "Daniel Brito"
+date: "09/01/2020"
+output: ioslides_presentation
+---
+        
+        
+        
+## My New Slide
+        Some content
+
+## My title
+
+### A top level subheading
+
+#### A second level subheading
+
+## My title
+
+- Bullet one
+- Bullet two
+
+1. Item 1
+2. Item b
+
+## Styles
+
+Plain text
+
+*italicized text*
+        
+        **Bold text**
+        
+        `for (i %in% 1 : 10)`
+
+***
+        ```{r head.mt, echo=FALSE, comment= ""}
+
+head(mtcars)
+
+```
+
+***
+        
+        ```{r plot, echo=FALSE, fig.align="center", fig.cap="My new figure"}
+library(ggplot2)
+
+
+ggplot(mtcars, aes(wt, mpg)) + geom_point() + theme_minimal()
+```
