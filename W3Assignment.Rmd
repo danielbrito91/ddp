@@ -1,0 +1,109 @@
+---
+title: "Week 3 Assignment"
+author: "Daniel Brito"
+date: "January 18, 2020"
+output: ioslides_presentation
+---
+
+## About the project
+
+The idea here was to view the 500 highest rated albums by the [The Needle Drop](https://www.youtube.com/user/theneedledrop). I performed some web scraping using `rvest` on the data of [Album of The Year](https://www.albumoftheyear.org/ratings/57-the-needle-drop-highest-rated/all/1).
+
+The code is in my Github account and it was inspired in [this post](https://community.rstudio.com/t/rvest-first-attempt-at-web-scraping-how-to-deal-with-multiple-pages-and-missing-values/13100/6) of RStudio Community.
+
+The plot shows the number of the top 500 albums by year of release.
+
+```{r code, include = FALSE, cache=TRUE}
+library(rvest)
+library(lubridate)
+library(tidyverse)
+library(plotly)
+
+pages <- c("https://www.albumoftheyear.org/ratings/57-the-needle-drop-highest-rated/all/") %>% paste0(1:20)
+
+read_rank <- function(url){
+        az <- read_html(url)
+        rank_f <- az %>%
+                html_nodes(".albumListRank") %>%
+                html_text() %>%
+                str_replace_all(". ", "") %>%
+                as.numeric() %>%
+                as_tibble()
+}
+
+read_name <- function(url){
+        az <- read_html(url)
+        name_f <- az %>%
+                html_nodes(".albumListTitle") %>%
+                html_text() %>%
+                str_replace_all( "^[0-9][0-9][0-9]. " , "") %>%
+                str_replace_all( "^[0-9][0-9]. " , "") %>%
+                str_replace_all( "^[1-9]. " , "") %>%
+                as_tibble()
+}
+
+read_note <- function(url){
+        az <- read_html(url)
+        note_f <- az %>%
+                html_nodes(".scoreValue") %>%
+                html_text() %>%
+                as.numeric() %>%
+                as_tibble()
+}
+
+read_releaseDate <- function(url){
+        az <- read_html(url)
+        releaseDate_f <- az %>%
+                html_nodes(".albumListDate") %>%
+                html_text() %>%
+                mdy() %>%
+                as_tibble()
+                
+}
+
+read_Genre <- function(url){
+        az <- read_html(url)
+        genre_f <- az %>%
+                html_nodes(".albumListGenre") %>%
+                html_text()  %>%
+                as_tibble()
+}
+
+
+
+ranks <- map_dfr(pages, read_rank)
+albums <- map_dfr(pages, read_name)
+notes <- map_dfr(pages, read_note)
+releaseDate <- map_dfr(pages, read_releaseDate)
+genres <- map_dfr(pages, read_Genre) #faltam muitos
+
+fantano <- data.frame(ranks, albums, notes, releaseDate)
+names(fantano) <- c("rank", "album", "score", "date")
+fantano <- tbl_df(fantano)
+fantano <- fantano %>% mutate(releaseMonth = month(fantano$date, label = TRUE, locale = "C")) %>%
+        mutate(releaseYear = year(date))
+
+```
+
+## The Plot!
+
+```{r packs, include = FALSE}
+library(tidyverse)
+library(plotly)
+```
+
+```{r plot, warning = FALSE, echo = FALSE, results = 'asis', fig.cap="Year of Release of the 500 Highest Rated Albums \n by The Needle Drop"}
+
+
+fantYear <- fantano %>%
+        group_by(releaseYear) %>%
+        summarise(total = n())
+
+fPlot <- ggplot(fantYear, aes(x = as.factor(releaseYear), y = total)) +
+        geom_col() +
+        labs(x = "Release year", y = "Number of albums") +
+        theme_minimal()
+
+ggplotly(fPlot)
+```
+
