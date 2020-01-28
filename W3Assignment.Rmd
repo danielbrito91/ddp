@@ -1,7 +1,7 @@
 ---
 title: "Week 3 Assignment"
 author: "Daniel Brito"
-date: "January 18, 2020"
+date: "January 27, 2020"
 output: ioslides_presentation
 ---
 
@@ -12,6 +12,8 @@ The idea here was to view the 500 highest rated albums by the [The Needle Drop](
 The code is in my Github account and it was inspired in [this post](https://community.rstudio.com/t/rvest-first-attempt-at-web-scraping-how-to-deal-with-multiple-pages-and-missing-values/13100/6) of RStudio Community.
 
 The plot shows the number of the top 500 albums by year of release.
+
+You can interact with the plot clicking at it.
 
 ```{r code, include = FALSE, cache=TRUE}
 library(rvest)
