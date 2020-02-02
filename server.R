@@ -3,9 +3,9 @@ library(leaflet)
 library(tidyverse)
 
 #serie historica
-dbo <- read.csv("https://metadados.ana.gov.br/geonetwork/srv/en/resources.get?id=318&fname=dbo_stats.csv&access=private", sep = ";", dec = ",")
-pt <- read.csv("https://metadados.ana.gov.br/geonetwork/srv/en/resources.get?id=318&fname=fosfototal_stats.csv&access=private", sep = ";", dec = ",")
-od <- read.csv("https://metadados.ana.gov.br/geonetwork/srv/en/resources.get?id=318&fname=od_stats.csv&access=private", sep = ";", dec = ",")
+dbo <- read.csv("./www/dbo_stats.csv", sep = ";", dec = ",")
+pt <- read.csv("./www/fosfototal_stats.csv", sep = ";", dec = ",")
+od <- read.csv("./www/od_stats.csv", sep = ";", dec = ",")
 
 # Filtra para o RS
 dbo <- dbo %>% filter(uf == "RS") %>% rename("dbo" = media)
