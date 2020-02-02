@@ -1,0 +1,107 @@
+---
+title: "Water Quality in the State of Rio Grande do Sul"
+author: "Daniel Brito"
+date: "Febryary 2, 2020"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Introduction
+
+The app contains an analysis of the distribution of water quality in the State of Rio Grande do Sul, south of Brazil.
+The data are from the [National Water Agency of Brazil](https://www.ana.gov.br/eng/), and shows the mean concentration the following parameters measured in different water bodies situated at the area:
+
+- Biological Oxygen Demand: measures the amount of oxygen that microorganisms consume while decomposing organic matter ([USEPA, 2009](https://www.epa.gov/sites/production/files/2015-09/documents/2009_03_13_estuaries_monitor_chap9.pdf))
+- Total Phosphorus: can cause algae blooms, accelerated plant growth, and low dissolved oxygen from the
+decomposition of additional vegetation ([USEPA](https://www.epa.gov/sites/production/files/2015-09/documents/totalphosphorus.pdf"))
+- Dissolved Oxygen: indicate how well aerated the water is ([USEPA, 2009](https://www.epa.gov/sites/production/files/2015-09/documents/2009_03_13_estuaries_monitor_chap9.pdf"))
+
+
+## Concentration of Biological Oxygen Demand
+
+```{r data, echo = FALSE, include=FALSE}
+library(shiny)
+library(leaflet)
+library(tidyverse)
+
+#serie historica
+dbo <- read.csv("./www/dbo_stats.csv", sep = ";", dec = ",")
+pt <- read.csv("./www/fosfototal_stats.csv", sep = ";", dec = ",")
+od <- read.csv("./www/od_stats.csv", sep = ";", dec = ",")
+
+# Filtra para o RS
+dbo <- dbo %>% filter(uf == "RS") %>% rename("dbo" = media)
+pt <- pt %>% filter(uf == "RS") %>% rename("pt" = media)
+od <- od %>% filter(uf == "RS") %>% rename("od" = media)
+
+# Merge data
+qualidade <- merge(dbo, pt[, c("codigo", "pt")], by = "codigo")
+qualidade <- merge(qualidade, od[, c("codigo", "od")], by = "codigo")
+qualidade <- qualidade %>% select(codigo, lat, lon, dbo, pt, od)
+```
+
+
+```{r bod, echo = FALSE}
+
+pal <- colorNumeric(
+        palette = colorRamp(c("#91c5ff", "#ff0000"),
+                            interpolate = "spline"), 
+        domain = qualidade$dbo)
+
+qualidade %>%
+        leaflet() %>%
+        addTiles() %>%
+        addCircleMarkers(lat = ~lat, lng = ~lon, 
+                         popup = ~paste0(as.character(round(dbo, 2)), " mg/L"),
+                         
+                         color = ~pal(dbo),
+                         stroke = FALSE, fillOpacity = .7)
+
+
+```
+ 
+## Concentration of Total Phosphorus
+ 
+ 
+```{r pt, echo = FALSE}
+
+pal <- colorNumeric(
+        palette = colorRamp(c("#91c5ff", "#ff0000"),
+                            interpolate = "spline"), 
+        domain = qualidade$pt)
+
+qualidade %>%
+        leaflet() %>%
+        addTiles() %>%
+        addCircleMarkers(lat = ~lat, lng = ~lon, 
+                         popup = ~paste0(as.character(round(pt, 2)), " mg/L"),
+                         
+                         color = ~pal(pt),
+                         stroke = FALSE, fillOpacity = .7)
+
+
+```
+
+## Concentration of Dissolved Oxygen
+```{r od, echo = FALSE}
+
+pal <- colorNumeric(
+        palette = colorRamp(c("#ff0000", "#91c5ff"),
+                            interpolate = "spline"), 
+        domain = qualidade$od)
+
+qualidade %>%
+        leaflet() %>%
+        addTiles() %>%
+        addCircleMarkers(lat = ~lat, lng = ~lon, 
+                         popup = ~paste0(as.character(round(od, 2)), " mg/L"),
+                         
+                         color = ~pal(od),
+                         stroke = FALSE, fillOpacity = .7)
+
+
+```
+
